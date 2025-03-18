@@ -146,23 +146,6 @@ func linkToStickerSubHandler(
 		isVideo = true
 	}
 
+	fmt.Println("halo")
 	convertMediaToSticker(client, senderJID, mediaPath, crop, isVideo)
-}
-
-func getPdfHandler(
-	client *whatsmeow.Client, 
-	senderJID waTypes.JID, 
-	vMessage *waProto.Message, 
-	messageText string,
-	){
-	crop := strings.Contains(strings.ToLower(messageText), "crop")
-
-	if vMessage.GetImageMessage() != nil {
-		convertImageToStickerSubHandler(client, senderJID, vMessage.GetImageMessage(), crop)
-	} else if vMessage.GetVideoMessage() != nil {
-		convertVideoToStickerSubHandler(client, senderJID, vMessage.GetVideoMessage(), crop)
-	} else {
-		linkToStickerSubHandler(client, senderJID, messageText, crop)
-	}
-
 }

@@ -151,7 +151,7 @@ func getNameHandler(client *whatsmeow.Client, senderJID waTypes.JID, messageText
 	}
 }
 
-func sendPDFHandler(client *whatsmeow.Client, senderJID waTypes.JID, vMessage *waProto.Message, messageText string){
+func sendPDFHandler(client *whatsmeow.Client, isFromGroup bool, senderJID waTypes.JID, vMessage *waProto.Message, messageText string){
 	groupJIDs := strings.Split(os.Getenv("GROUP_JIDS"), ",")
 
 	userRegistered := false
@@ -181,7 +181,7 @@ func sendPDFHandler(client *whatsmeow.Client, senderJID waTypes.JID, vMessage *w
 		}
 	}
 
-	if !userRegistered{	
+	if !isFromGroup && !userRegistered {
 		return
 	}
 
@@ -200,7 +200,7 @@ func sendPDFHandler(client *whatsmeow.Client, senderJID waTypes.JID, vMessage *w
 	}
 }
 
-func listMapelHandler(client *whatsmeow.Client, senderJID waTypes.JID){
+func listMapelHandler(client *whatsmeow.Client, isFromGroup bool, senderJID waTypes.JID){
 	groupJIDs := strings.Split(os.Getenv("GROUP_JIDS"), ",")
 
 	userRegistered := false
@@ -230,7 +230,7 @@ func listMapelHandler(client *whatsmeow.Client, senderJID waTypes.JID){
 		}
 	}
 
-	if !userRegistered{	
+	if !isFromGroup && !userRegistered {
 		return
 	}
 

@@ -47,7 +47,7 @@ func sendPDFMessage(client *whatsmeow.Client, senderJID waTypes.JID, mapel strin
 				Conversation: proto.String("Format Jawaban Salah"),
 			})
 		}
-		pdfPath, err = fetchPDF(mapel, jsonAnswer)
+		pdfPath, _ = fetchPDF(mapel, jsonAnswer)
 	}
 
 	// dataKunci := map[string]string{

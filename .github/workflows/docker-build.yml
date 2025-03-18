@@ -27,3 +27,9 @@ jobs:
         run: |
           docker tag "${{ secrets.DOCKER_IMAGE }}" "${{ secrets.DOCKER_USERNAME }}"/"${{ secrets.DOCKER_IMAGE }}"
           docker push "${{ secrets.DOCKER_USERNAME }}"/"${{ secrets.DOCKER_IMAGE }}"
+
+      - name: Notify Deployment Server
+        run: |
+          curl -X POST "${{ secrets.WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{"secret": "${{ secrets.WEBHOOK_SECRET }}"}'

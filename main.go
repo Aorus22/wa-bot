@@ -17,6 +17,7 @@ import (
 	"github.com/mdp/qrterminal"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store/sqlstore"
+	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 )
@@ -24,9 +25,19 @@ import (
 func eventHandler(evt interface{}, client *whatsmeow.Client) {
 	switch v := evt.(type) {
 	case *events.Message:
+		adminGroupsEnv := os.Getenv("ADMIN_GROUPS")
+		adminGroups := strings.Split(adminGroupsEnv, ",")
+
 		if v.Info.IsGroup {
-			return
+			groupJID := v.Info.Chat.String()
+			if !contains(adminGroups, groupJID) {
+				return
+			}
 		}
+
+		// if v.Info.IsGroup {
+		// 	return
+		// }
 
 		msgTime := v.Info.Timestamp
 		now := time.Now()
@@ -39,6 +50,16 @@ func eventHandler(evt interface{}, client *whatsmeow.Client) {
 		// spew.Config.MaxDepth = 2
 		// spew.Printf("messageContextInfo: %#v\n\n", v.Message)
 
+		var senderJID types.JID
+		isFromGroup := false
+
+		if v.Info.IsGroup {
+			senderJID = v.Info.Chat.ToNonAD()
+			isFromGroup = true
+		} else {
+			senderJID = v.Info.Sender.ToNonAD()
+		}
+
 		var messageText string
 		if v.Message.ExtendedTextMessage != nil && v.Message.ExtendedTextMessage.Text != nil {
 			messageText = *v.Message.ExtendedTextMessage.Text
@@ -49,8 +70,6 @@ func eventHandler(evt interface{}, client *whatsmeow.Client) {
 		} else {
 			messageText = v.Message.GetConversation()
 		}
-
-		senderJID := v.Info.Sender.ToNonAD()
 
 		fmt.Println(senderJID.UserInt(), "=>", messageText)
 
@@ -82,11 +101,11 @@ func eventHandler(evt interface{}, client *whatsmeow.Client) {
 		} else if messageText == "!token" {
 			tokenHandler(client, senderJID)
 		} else if messageText == "!listmapel" {
-			listMapelHandler(client, senderJID)
+			listMapelHandler(client, isFromGroup, senderJID)
 		} else if pdfRegex.MatchString(messageText) {
-			sendPDFHandler(client, senderJID, v.Message, messageText)
+			sendPDFHandler(client, isFromGroup, senderJID, v.Message, messageText)
 		} else if answerPdfRegex.MatchString(messageText) {
-			sendPDFHandler(client, senderJID, v.Message, messageText)
+			sendPDFHandler(client, isFromGroup, senderJID, v.Message, messageText)
 		} else if stickerRegex.MatchString(messageText) {
 			stickerHandler(client, senderJID, v.Message, messageText)
 		} else {
