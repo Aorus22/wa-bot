@@ -81,6 +81,8 @@ func eventHandler(evt interface{}, client *whatsmeow.Client) {
 			listgroupsHandler(client, senderJID)
 		} else if messageText == "!token" {
 			tokenHandler(client, senderJID)
+		} else if messageText == "!listmapel" {
+			listMapelHandler(client, senderJID)
 		} else if pdfRegex.MatchString(messageText) {
 			sendPDFHandler(client, senderJID, v.Message, messageText)
 		} else if answerPdfRegex.MatchString(messageText) {

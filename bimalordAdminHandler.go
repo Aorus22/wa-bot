@@ -199,3 +199,48 @@ func sendPDFHandler(client *whatsmeow.Client, senderJID waTypes.JID, vMessage *w
 		sendPDFMessage(client, senderJID, mapel, "")
 	}
 }
+
+func listMapelHandler(client *whatsmeow.Client, senderJID waTypes.JID){
+	groupJIDs := strings.Split(os.Getenv("GROUP_JIDS"), ",")
+
+	userRegistered := false
+
+	for _, groupJIDStr := range groupJIDs {
+		targetGroupJID, err := waTypes.ParseJID(groupJIDStr)
+		if err != nil {
+			fmt.Println("Invalid group JID:", err)
+			continue
+		}
+
+		groupInfo, err := client.GetGroupInfo(targetGroupJID)
+		if err != nil {
+			fmt.Println("Failed to get group info for", groupJIDStr, ":", err)
+			continue
+		}
+
+		for _, participant := range groupInfo.Participants {
+			if participant.JID.String() == senderJID.String() {
+				userRegistered = true
+				break
+			}
+		}
+
+		if userRegistered {
+			break
+		}
+	}
+
+	if !userRegistered{	
+		return
+	}
+
+	listMapel, err := fetchMapel()
+	if err != nil {
+		fmt.Println("Failed to fetch mapel:", err)
+		return
+	}
+
+	client.SendMessage(context.Background(), senderJID, &waProto.Message{
+		Conversation: proto.String(listMapel),
+	})
+}

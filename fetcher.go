@@ -69,7 +69,9 @@ func fetchTokenData(nama, nis string) (string, string, error) {
 // }
 
 func fetchPDF(mapel string, dataKunci ...map[string]string) (string, error) {
-	url := fmt.Sprintf("http://localhost:3000/pdf/%s", mapel)
+	pdfURL := os.Getenv("PDF_URL")
+	
+	url := fmt.Sprintf("%s/pdf/%s", pdfURL, mapel)
 
 	mediaFolder := "media"
 	if _, err := os.Stat(mediaFolder); os.IsNotExist(err) {
@@ -125,4 +127,36 @@ func fetchPDF(mapel string, dataKunci ...map[string]string) (string, error) {
 	}
 
 	return filePath, nil
+}
+
+func fetchMapel() (string, error) {
+    pdfURL := os.Getenv("PDF_URL")
+    url := fmt.Sprintf("%s/listmapel", pdfURL)
+
+    resp, err := http.Get(url)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    body, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return "", err
+    }
+
+    var result struct {
+        MapelList []string `json:"mapelList"`
+    }
+
+    err = json.Unmarshal(body, &result)
+    if err != nil {
+        return "", err
+    }
+
+    var output string
+    for i, mapel := range result.MapelList {
+        output += fmt.Sprintf("%d. %s\n", i+1, mapel)
+    }
+
+    return output, nil
 }
