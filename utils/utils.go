@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"errors"
@@ -11,16 +11,16 @@ import (
 	"time"
 )
 
-func contains(slice []string, item string) bool {
+func Contains(slice []string, item string) bool {
 	for _, v := range slice {
 		if strings.EqualFold(v, item) {
 			return true
 		}
 	}
 	return false
-} 
+}
 
-func getLinkFromString(input string) (string, error) {
+func GetLinkFromString(input string) (string, error) {
 	urlRegex := regexp.MustCompile(`^(https?:\/\/)?([\w-]+\.)+[\w-]+(:\d+)?(\/[\w\-\.~!*'();:@&=+$,/?%#]*)?$`)
 	words := strings.Split(input, " ")
 	for _, word := range words {
@@ -31,7 +31,7 @@ func getLinkFromString(input string) (string, error) {
 	return "", errors.New("no link found")
 }
 
-func downloadMediaFromURL(url string) (string, error) {
+func DownloadMediaFromURL(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -57,7 +57,7 @@ func downloadMediaFromURL(url string) (string, error) {
 	return mediaPath, nil
 }
 
-func getMimeType(filePath string) (string, error) {
+func GetMimeType(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", err
@@ -74,24 +74,3 @@ func getMimeType(filePath string) (string, error) {
 	return mimeType, nil
 }
 
-func convertToJSON(input string) (map[string]string, error) {
-	lines := strings.Split(input, "\n")
-
-	dataKunci := make(map[string]string)
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line) 
-		if line == "-" || line == "" {
-			continue 
-		}
-
-		parts := strings.SplitN(line, ".", 2) 
-		if len(parts) == 2 {
-			nomor := strings.TrimSpace(parts[0])
-			jawaban := strings.TrimSpace(parts[1])
-			dataKunci[nomor] = strings.ToUpper(jawaban)
-		}
-	}
-
-	return dataKunci, nil
-}
